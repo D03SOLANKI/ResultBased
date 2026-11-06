@@ -1,0 +1,13 @@
+{
+  "nse_total_records": 2635,
+  "nse_unique_isins": 2635,
+  "bse_total_records": 5252,
+  "bse_unique_isins": 5251,
+  "common_isins": 2508,
+  "nse_only_isins": 127,
+  "bse_only_isins": 2743,
+  "pct_nse_on_bse": 95.18,
+  "pct_bse_on_nse": 47.76,
+  "symbol_mismatch_count_in_common": 1,
+  "symbol_mismatch_pct": 0.04
+}

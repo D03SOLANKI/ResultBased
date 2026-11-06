@@ -1,0 +1,20 @@
+[Unit]
+Description=All India Listed Companies Upcoming Financial Results Scanner & Surveillance Service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/ResultBased-Strategy
+Environment="PATH=/home/ubuntu/ResultBased-Strategy/venv/bin"
+Environment="PYTHONUNBUFFERED=1"
+Environment="TZ=Asia/Kolkata"
+ExecStart=/home/ubuntu/ResultBased-Strategy/venv/bin/python run_system.py
+Restart=always
+RestartSec=5
+
+# Hardening
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

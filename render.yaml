@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: results-scanner
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free # Change to starter ($7/mo) if you wish to attach a persistent disk
+    region: singapore # Closest low-latency region to NSE/BSE
+    envVars:
+      - key: TZ
+        value: Asia/Kolkata
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: HOST
+        value: 0.0.0.0
+    healthCheckPath: /api/health

@@ -1,0 +1,47 @@
+[
+  {
+    "page": "list_scrips",
+    "url": "https://www.bseindia.com/corporates/List_Scrips.html",
+    "method": "GET",
+    "post_data": null,
+    "status": 403,
+    "content_type": "text/html",
+    "body_preview": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;www&#46;bseindia&#46;com&#47;corporates&#47;List&#95;Scrips&#46;html\" on this server.<P>\nReference&#32;&#35;18&#46;94f9da17&#46;1793610949&#46;941b3ef2\n<P>https&#58;&#47;&#47;errors&#46;edgesuite&#46;net&#47;18&#46;94f9da17&#46;1793610949&#46;941b3ef2</P>\n</BODY>\n</HTML>\n"
+  },
+  {
+    "page": "board_meetings",
+    "url": "https://www.bseindia.com/corporates/board_meetings.aspx",
+    "method": "GET",
+    "post_data": null,
+    "status": 403,
+    "content_type": "text/html",
+    "body_preview": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;www&#46;bseindia&#46;com&#47;corporates&#47;board&#95;meetings&#46;aspx\" on this server.<P>\nReference&#32;&#35;18&#46;94f9da17&#46;1793610953&#46;941bd28c\n<P>https&#58;&#47;&#47;errors&#46;edgesuite&#46;net&#47;18&#46;94f9da17&#46;1793610953&#46;941bd28c</P>\n</BODY>\n</HTML>\n"
+  },
+  {
+    "page": "forth_results",
+    "url": "https://www.bseindia.com/corporates/forth_results.aspx",
+    "method": "GET",
+    "post_data": null,
+    "status": 403,
+    "content_type": "text/html",
+    "body_preview": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;www&#46;bseindia&#46;com&#47;corporates&#47;forth&#95;results&#46;aspx\" on this server.<P>\nReference&#32;&#35;18&#46;94f9da17&#46;1793610956&#46;941c6abe\n<P>https&#58;&#47;&#47;errors&#46;edgesuite&#46;net&#47;18&#46;94f9da17&#46;1793610956&#46;941c6abe</P>\n</BODY>\n</HTML>\n"
+  },
+  {
+    "page": "announcements",
+    "url": "https://www.bseindia.com/corporates/ann.html",
+    "method": "GET",
+    "post_data": null,
+    "status": 403,
+    "content_type": "text/html",
+    "body_preview": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;www&#46;bseindia&#46;com&#47;corporates&#47;ann&#46;html\" on this server.<P>\nReference&#32;&#35;18&#46;94f9da17&#46;1793610960&#46;941cfe9a\n<P>https&#58;&#47;&#47;errors&#46;edgesuite&#46;net&#47;18&#46;94f9da17&#46;1793610960&#46;941cfe9a</P>\n</BODY>\n</HTML>\n"
+  },
+  {
+    "page": "comp_results",
+    "url": "https://www.bseindia.com/corporates/Comp_Results.html",
+    "method": "GET",
+    "post_data": null,
+    "status": 403,
+    "content_type": "text/html",
+    "body_preview": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;www&#46;bseindia&#46;com&#47;corporates&#47;Comp&#95;Results&#46;html\" on this server.<P>\nReference&#32;&#35;18&#46;94f9da17&#46;1793610963&#46;941d9502\n<P>https&#58;&#47;&#47;errors&#46;edgesuite&#46;net&#47;18&#46;94f9da17&#46;1793610963&#46;941d9502</P>\n</BODY>\n</HTML>\n"
+  }
+]

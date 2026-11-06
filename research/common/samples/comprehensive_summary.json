@@ -1,0 +1,14 @@
+{
+  "nse_mainboard_count": 2635,
+  "nse_sme_count": 582,
+  "nse_total_unique_isins": 3217,
+  "bse_mainboard_count": 4686,
+  "bse_sme_count": 566,
+  "bse_total_unique_isins": 5249,
+  "dual_listed_count": 2508,
+  "nse_only_count": 709,
+  "bse_only_count": 2742,
+  "pct_nse_on_bse": 77.96,
+  "pct_bse_on_nse": 47.77,
+  "sme_cross_listing_count": 0
+}
