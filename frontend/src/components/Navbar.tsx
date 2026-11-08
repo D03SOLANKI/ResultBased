@@ -7,7 +7,8 @@ import {
   RefreshCw, 
   CheckCircle2,
   TrendingUp,
-  Moon
+  Moon,
+  Terminal
 } from 'lucide-react';
 
 export type NavTab = 'table' | 'reaction' | 'post_market' | 'calendar' | 'report' | 'announcements';
@@ -16,6 +17,7 @@ interface NavbarProps {
   activeTab: NavTab;
   setActiveTab: (tab: NavTab) => void;
   onRefresh: () => void;
+  onOpenConsole: () => void;
   isSyncing: boolean;
   totalUnique: number;
 }
@@ -24,6 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
   onRefresh,
+  onOpenConsole,
   isSyncing,
   totalUnique
 }) => {
@@ -105,9 +108,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </nav>
 
-          {/* Right Controls: IST Clock & Clean Sync Button */}
-          <div className="flex items-center space-x-3 shrink-0">
-            <div className="hidden xl:flex flex-col text-right">
+          {/* Right Controls: Live Console, IST Clock & Sync Button */}
+          <div className="flex items-center space-x-2.5 shrink-0">
+            {/* Live Console Terminal Button */}
+            <button
+              onClick={onOpenConsole}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-slate-100 hover:bg-slate-800 border border-slate-700 shadow-xs active:scale-95 transition-all"
+              title="Open 24/7 Engine Live Surveillance Console"
+            >
+              <Terminal className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Live Console</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            </button>
+
+            <div className="hidden xl:flex flex-col text-right pl-1">
               <span className="text-xs font-mono font-bold text-slate-900">{istTime}</span>
               <span className="text-[10px] text-emerald-600 font-medium flex items-center justify-end gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>

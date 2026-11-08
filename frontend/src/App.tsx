@@ -8,10 +8,12 @@ import { AnnouncementMonitor } from './components/AnnouncementMonitor';
 import { CompanyDetailModal } from './components/CompanyDetailModal';
 import { MarketReactionAnalysis } from './components/MarketReactionAnalysis';
 import { PostMarketTracker } from './components/PostMarketTracker';
+import { LiveConsoleModal } from './components/LiveConsoleModal';
 import { OverviewStats, ResultEvent } from './types';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('table');
+  const [isConsoleOpen, setIsConsoleOpen] = useState<boolean>(false);
   const [stats, setStats] = useState<OverviewStats | null>(null);
   const [events, setEvents] = useState<ResultEvent[]>([]);
   const [totalEvents, setTotalEvents] = useState<number>(0);
@@ -121,6 +123,7 @@ export function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onRefresh={handleSync}
+        onOpenConsole={() => setIsConsoleOpen(true)}
         isSyncing={isSyncing}
         totalUnique={stats?.total_unique_companies || 0}
       />
@@ -252,6 +255,12 @@ export function App() {
         )}
 
       </main>
+
+      {/* Live Console Modal */}
+      <LiveConsoleModal
+        isOpen={isConsoleOpen}
+        onClose={() => setIsConsoleOpen(false)}
+      />
 
       {/* Company Detail Modal */}
       {selectedCompany && (

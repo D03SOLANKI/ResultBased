@@ -287,6 +287,18 @@ def get_surveillance_status():
     """
     return surveillance_state.get_status()
 
+@router.get("/surveillance/logs")
+def get_surveillance_logs(limit: int = 100):
+    """
+    Returns live in-memory logs of the real-time background surveillance daemon.
+    """
+    return {
+        "status": "active" if surveillance_state.is_active else "idle",
+        "last_scan": surveillance_state.last_scan_time,
+        "scan_count": surveillance_state.scan_count,
+        "logs": surveillance_state.get_logs(limit=limit)
+    }
+
 @router.post("/surveillance/trigger-scan")
 def trigger_surveillance_scan():
     """
