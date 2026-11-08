@@ -4,6 +4,12 @@ Launcher script for Backend API & React Dashboard.
 """
 import sys
 import os
+
+# Ensure current working directory is first in sys.path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
 import uvicorn
 from backend.app.database import init_db, get_db
 from backend.app.services.ingestion import run_full_sync

@@ -48,9 +48,9 @@ RUN mkdir -p /app/backend/data
 # Expose default HTTP port
 EXPOSE 8000
 
-# Health check
+# Health check (dynamically evaluates the assigned PORT)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://127.0.0.1:8000/api/health || exit 1
+  CMD curl -f http://127.0.0.1:${PORT:-8000}/api/health || exit 1
 
 # Start the unified production server (serves REST API + React SPA + 24/7 Surveillance Engine)
 CMD ["python", "run_system.py"]
