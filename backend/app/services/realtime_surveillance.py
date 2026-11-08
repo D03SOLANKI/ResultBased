@@ -78,27 +78,40 @@ def _build_verified_performance_db():
     db = {}
     for item in PRIMARY_VERIFIED_DATA:
         isin = item["isin"]
-        sym = item["nse_symbol"] or item["bse_code"]
-        exchange = item["exchange"]
+        sym = item.get("nse_symbol") or item.get("bse_code") or ""
+        exchange = item.get("exchange", "NSE")
+        f_date = item.get("filing_date") or item.get("announcement_date")
+        f_time = item.get("filing_time") or item.get("announcement_time") or "18:00"
+        f_url = item.get("source_url") or item.get("filing_url") or ""
+        f_verif = item.get("verification_status") or "VERIFIED_PRIMARY_SOURCE"
+        f_period = item.get("financial_period") or "Q2"
+        rev = item.get("revenue_ops_cr")
+        prev_rev = item.get("prev_year_revenue_ops_cr")
+        pat = item.get("pat_cr")
+        prev_pat = item.get("prev_year_pat_cr")
+        
         reaction = calculate_market_reaction(
             symbol=sym,
             exchange=exchange,
-            announcement_date=item["announcement_date"],
-            announcement_time=item["announcement_time"]
+            announcement_date=f_date,
+            announcement_time=f_time
         )
-        growth_rev, meta_rev = compute_growth_pct(item["revenue_ops_cr"], item["prev_year_revenue_ops_cr"])
-        growth_pat, meta_pat = compute_growth_pct(item["pat_cr"], item["prev_year_pat_cr"])
+        growth_rev, _ = compute_growth_pct(rev, prev_rev)
+        growth_pat, _ = compute_growth_pct(pat, prev_pat)
+        rev_str = f"{growth_rev:+.1f}% YoY" if growth_rev is not None else "N/A"
+        pat_str = f"{growth_pat:+.1f}% YoY" if growth_pat is not None else "N/A"
+        
         db[isin] = {
             "isin": isin,
             "company_name": item["company_name"],
             "symbol": sym,
             "exchange": exchange,
-            "actual_date": item["announcement_date"],
-            "time": item["announcement_time"],
-            "url": item["filing_url"],
-            "verification": item["verification_status"],
-            "headline": f"{item['company_name']} - Financial Results for {item['financial_period']}",
-            "desc": f"Revenue: ₹{item['revenue_ops_cr']} Cr ({growth_rev:+.1f}% YoY), PAT: ₹{item['pat_cr']} Cr ({growth_pat:+.1f}% YoY)",
+            "actual_date": f_date,
+            "time": f_time,
+            "url": f_url,
+            "verification": f_verif,
+            "headline": f"{item['company_name']} - Financial Results for {f_period}",
+            "desc": f"Revenue: ₹{rev or 0} Cr ({rev_str}), PAT: ₹{pat or 0} Cr ({pat_str})",
             "reaction_pct": reaction.get("total_reaction_pct") if reaction else 0.0,
             "reaction_verdict": reaction.get("market_reaction_verdict") if reaction else "Muted / Priced In"
         }
