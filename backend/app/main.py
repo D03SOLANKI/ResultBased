@@ -4,12 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from backend.app.database import init_db
-from backend.app.routers import stats, calendar, companies, announcements, report, performance, post_market_tracker, strategy_validation, backtest
+from backend.app.routers import stats, calendar, companies, announcements, report, performance, post_market_tracker
 from backend.app.services.realtime_surveillance import start_surveillance_worker, stop_surveillance_worker
 from backend.app.services.financial_statement_verifier import execute_full_verification_and_seeding
 from backend.app.services.post_market_engine import seed_post_market_tracker_data
 from backend.app.services.calendar_reconciliation_engine import run_calendar_reconciliation
-from backend.app.services.strategy_validation_engine import seed_verified_strategy_validation_dataset
 
 app = FastAPI(
     title="All India Listed Companies - Upcoming Financial Results Scanner",
@@ -34,8 +33,6 @@ app.include_router(announcements.router)
 app.include_router(report.router)
 app.include_router(performance.router)
 app.include_router(post_market_tracker.router)
-app.include_router(strategy_validation.router)
-app.include_router(backtest.router)
 
 @app.on_event("startup")
 def on_startup():
@@ -43,7 +40,6 @@ def on_startup():
     execute_full_verification_and_seeding()
     seed_post_market_tracker_data()
     run_calendar_reconciliation()
-    seed_verified_strategy_validation_dataset()
     start_surveillance_worker(interval_sec=30)
 
 @app.on_event("shutdown")
@@ -80,4 +76,3 @@ if os.path.exists(FRONTEND_DIST):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)
-

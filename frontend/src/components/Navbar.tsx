@@ -7,14 +7,14 @@ import {
   RefreshCw, 
   CheckCircle2,
   TrendingUp,
-  Moon,
-  ShieldCheck,
-  Wallet
+  Moon
 } from 'lucide-react';
 
+export type NavTab = 'table' | 'reaction' | 'post_market' | 'calendar' | 'report' | 'announcements';
+
 interface NavbarProps {
-  activeTab: 'table' | 'reaction' | 'post_market' | 'validation' | 'backtest' | 'calendar' | 'report' | 'announcements';
-  setActiveTab: (tab: 'table' | 'reaction' | 'post_market' | 'validation' | 'backtest' | 'calendar' | 'report' | 'announcements') => void;
+  activeTab: NavTab;
+  setActiveTab: (tab: NavTab) => void;
   onRefresh: () => void;
   isSyncing: boolean;
   totalUnique: number;
@@ -49,13 +49,22 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => clearInterval(timer);
   }, []);
 
+  const navItems: { id: NavTab; label: string; icon: React.ReactNode }[] = [
+    { id: 'table', label: 'Results Scanner', icon: <BarChart3 className="w-3.5 h-3.5" /> },
+    { id: 'reaction', label: 'Results vs Market Reaction', icon: <TrendingUp className="w-3.5 h-3.5 text-blue-600" /> },
+    { id: 'post_market', label: 'Post-Market Tracker', icon: <Moon className="w-3.5 h-3.5 text-indigo-500" /> },
+    { id: 'calendar', label: 'Calendar', icon: <Calendar className="w-3.5 h-3.5 text-slate-500" /> },
+    { id: 'report', label: '8 AM Report', icon: <FileText className="w-3.5 h-3.5 text-slate-500" /> },
+    { id: 'announcements', label: 'Live Disclosures', icon: <Radio className="w-3.5 h-3.5 text-emerald-600" /> },
+  ];
+
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all shadow-xs">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-4">
           
           {/* Logo & Headline */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 shrink-0">
             <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-xs">
               <BarChart3 className="w-4 h-4 text-emerald-400 stroke-[2.5]" />
             </div>
@@ -69,117 +78,39 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5 font-medium">
-                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                <span>Tracking <strong className="text-slate-900 font-semibold">{totalUnique > 0 ? totalUnique.toLocaleString() : '5,958'}</strong> listed companies for upcoming results</span>
+                <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                <span>Tracking <strong className="text-slate-900 font-semibold">{totalUnique > 0 ? totalUnique.toLocaleString() : '5,958'}</strong> listed companies</span>
               </p>
             </div>
           </div>
 
-          {/* Minimalist Segmented Navigation Tabs */}
-          <nav className="hidden md:flex items-center space-x-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
-            <button
-              onClick={() => setActiveTab('table')}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'table'
-                  ? 'bg-white text-slate-900 shadow-xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-              }`}
-            >
-              <BarChart3 className="w-3.5 h-3.5 text-slate-500" />
-              <span>Results Scanner</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('reaction')}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'reaction'
-                  ? 'bg-white text-slate-900 shadow-xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-              }`}
-            >
-              <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
-              <span>Results vs Market Reaction</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('post_market')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'post_market'
-                  ? 'bg-indigo-600 text-white shadow-xs font-bold'
-                  : 'text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100 hover:text-indigo-900'
-              }`}
-            >
-              <Moon className="w-3.5 h-3.5" />
-              <span>Post-Market Tracker</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('validation')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'validation'
-                  ? 'bg-emerald-700 text-white shadow-xs font-bold'
-                  : 'text-emerald-800 bg-emerald-50/80 hover:bg-emerald-100 hover:text-emerald-950 font-bold border border-emerald-200'
-              }`}
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Strategy Validation</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('backtest')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'backtest'
-                  ? 'bg-purple-700 text-white shadow-xs font-bold'
-                  : 'text-purple-800 bg-purple-50/80 hover:bg-purple-100 hover:text-purple-950 font-bold border border-purple-200'
-              }`}
-            >
-              <Wallet className="w-3.5 h-3.5 text-purple-600" />
-              <span>1-Yr Backtest (₹10L)</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('calendar')}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'calendar'
-                  ? 'bg-white text-slate-900 shadow-xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-              }`}
-            >
-              <Calendar className="w-3.5 h-3.5 text-slate-500" />
-              <span>Calendar</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('report')}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'report'
-                  ? 'bg-white text-slate-900 shadow-xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-              }`}
-            >
-              <FileText className="w-3.5 h-3.5 text-slate-500" />
-              <span>8 AM Report</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('announcements')}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'announcements'
-                  ? 'bg-white text-slate-900 shadow-xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-              }`}
-            >
-              <Radio className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Live Disclosures</span>
-            </button>
+          {/* Clean Spacious Segmented Navigation Tabs */}
+          <nav className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 overflow-x-auto no-scrollbar shrink">
+            {navItems.map((item) => {
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                    isActive
+                      ? 'bg-white text-slate-900 shadow-xs font-bold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                  }`}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
           </nav>
 
           {/* Right Controls: IST Clock & Clean Sync Button */}
-          <div className="flex items-center space-x-3">
-            <div className="hidden lg:flex flex-col text-right">
+          <div className="flex items-center space-x-3 shrink-0">
+            <div className="hidden xl:flex flex-col text-right">
               <span className="text-xs font-mono font-bold text-slate-900">{istTime}</span>
-              <span className="text-[10px] text-emerald-700 font-semibold flex items-center justify-end gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span className="text-[10px] text-emerald-600 font-medium flex items-center justify-end gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 Official Feeds Active
               </span>
             </div>
@@ -187,11 +118,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={onRefresh}
               disabled={isSyncing}
-              className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 active:scale-95 text-slate-800 text-xs font-bold rounded-lg border border-slate-200 shadow-xs transition"
-              title="Refresh / Sync live exchange data"
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                isSyncing 
+                  ? 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed'
+                  : 'bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border-slate-200 shadow-xs active:scale-95'
+              }`}
+              title="Sync latest live exchange filings from NSE & BSE"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-slate-600 ${isSyncing ? 'animate-spin' : ''}`} />
-              <span>{isSyncing ? 'Syncing...' : 'Sync Data'}</span>
+              <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isSyncing ? 'animate-spin text-emerald-600' : ''}`} />
+              <span className="hidden sm:inline">{isSyncing ? 'Syncing...' : 'Sync Data'}</span>
             </button>
           </div>
 

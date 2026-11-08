@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Navbar } from './components/Navbar';
+import { Navbar, NavTab } from './components/Navbar';
 import { StatCards } from './components/StatCards';
 import { ResultsCalendar } from './components/ResultsCalendar';
 import { CompanyTable } from './components/CompanyTable';
@@ -8,12 +8,10 @@ import { AnnouncementMonitor } from './components/AnnouncementMonitor';
 import { CompanyDetailModal } from './components/CompanyDetailModal';
 import { MarketReactionAnalysis } from './components/MarketReactionAnalysis';
 import { PostMarketTracker } from './components/PostMarketTracker';
-import { StrategyValidationDashboard } from './components/StrategyValidationDashboard';
-import { BacktestDashboard } from './components/BacktestDashboard';
 import { OverviewStats, ResultEvent } from './types';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'table' | 'reaction' | 'post_market' | 'validation' | 'backtest' | 'calendar' | 'report' | 'announcements'>('table');
+  const [activeTab, setActiveTab] = useState<NavTab>('table');
   const [stats, setStats] = useState<OverviewStats | null>(null);
   const [events, setEvents] = useState<ResultEvent[]>([]);
   const [totalEvents, setTotalEvents] = useState<number>(0);
@@ -103,11 +101,11 @@ export function App() {
     setActiveTab('table');
   };
 
-  // Handle manual sync trigger
+  // Handle Sync action
   const handleSync = async () => {
     setIsSyncing(true);
     try {
-      await fetch('/api/report/sync', { method: 'POST' });
+      await fetch('/api/calendar/sync', { method: 'POST' });
       fetchStats();
       fetchEvents();
     } catch (err) {
@@ -118,8 +116,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white">
-      {/* Top Minimalist Navigation */}
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-slate-200">
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -128,32 +125,33 @@ export function App() {
         totalUnique={stats?.total_unique_companies || 0}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <main className="max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 space-y-6">
         
-        {/* Top Operational Metrics */}
-        <StatCards
-          stats={stats}
-          onFilterClick={handleCardFilterClick}
-          activeFilter={activeTab === 'reaction' ? 'released' : (selectedDate ? '' : quickFilter)}
-        />
+        {/* Compliance Banner */}
+        <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl px-4 py-3 flex items-center justify-between text-xs text-emerald-900 shadow-2xs">
+          <div className="flex items-center space-x-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="font-semibold text-emerald-950">Exclusively Financial Results & Performance Announcements:</span>
+            <span className="text-emerald-800">
+              Tracking Quarterly (Q1-Q4), Half-Yearly (H1/H2), Annual Audited Results & Monthly Performance Updates. Non-financial corporate announcements are excluded.
+            </span>
+          </div>
+          <span className="font-mono text-[11px] font-bold text-emerald-700 bg-white/80 px-2 py-0.5 rounded border border-emerald-200 shrink-0 ml-2">
+            SEBI Reg 33 & 29
+          </span>
+        </div>
 
-        {/* Tab 1: Results Table (Primary Scanner) */}
+        {/* Top Summary Stat Cards */}
+        {stats && (
+          <StatCards
+            stats={stats}
+            onFilterClick={handleCardFilterClick}
+          />
+        )}
+
+        {/* Tab 1: Primary Results Scanner Table */}
         {activeTab === 'table' && (
-          <div className="animate-in fade-in duration-150">
-            {selectedDate && (
-              <div className="mb-3.5 flex items-center justify-between bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-xs">
-                <span className="text-xs text-slate-600 font-medium">
-                  Filtering for expected financial results release date: <strong className="text-slate-900 font-mono">{selectedDate}</strong>
-                </span>
-                <button
-                  onClick={() => { setSelectedDate(null); setQuickFilter('today'); }}
-                  className="text-xs font-semibold text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg transition"
-                >
-                  Reset to Today
-                </button>
-              </div>
-            )}
+          <div className="space-y-4 animate-in fade-in duration-150">
             <CompanyTable
               events={events}
               total={totalEvents}
@@ -193,28 +191,14 @@ export function App() {
           </div>
         )}
 
-        {/* Tab 2b: Post-Market Earnings Reaction Tracker */}
+        {/* Tab 3: Post-Market Earnings Reaction Tracker */}
         {activeTab === 'post_market' && (
           <div className="animate-in fade-in duration-150">
             <PostMarketTracker />
           </div>
         )}
 
-        {/* Tab 2c: Strategy vs Actual Market Performance Validation Engine */}
-        {activeTab === 'validation' && (
-          <div className="animate-in fade-in duration-150">
-            <StrategyValidationDashboard />
-          </div>
-        )}
-
-        {/* Tab 2d: 1-Year Historical Backtest (₹10 Lakh Portfolio) */}
-        {activeTab === 'backtest' && (
-          <div className="animate-in fade-in duration-150">
-            <BacktestDashboard />
-          </div>
-        )}
-
-        {/* Tab 3: Calendar Timeline */}
+        {/* Tab 4: Calendar Timeline */}
         {activeTab === 'calendar' && (
           <div className="animate-in fade-in duration-150 space-y-4">
             <ResultsCalendar
@@ -253,14 +237,14 @@ export function App() {
           </div>
         )}
 
-        {/* Tab 4: Daily 8 AM Report */}
+        {/* Tab 5: Daily 8 AM Report */}
         {activeTab === 'report' && (
           <div className="animate-in fade-in duration-150">
             <DailyReportView />
           </div>
         )}
 
-        {/* Tab 5: Live Announcements Feed */}
+        {/* Tab 6: Live Announcements Feed */}
         {activeTab === 'announcements' && (
           <div className="animate-in fade-in duration-150">
             <AnnouncementMonitor />
