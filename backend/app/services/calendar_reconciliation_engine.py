@@ -171,9 +171,10 @@ def run_calendar_reconciliation():
         cursor.execute("SELECT isin, filing_date, filing_time, source_url FROM verified_financial_statements")
         vfs_filings = {(r["isin"], r["filing_date"]): dict(r) for r in cursor.fetchall()}
 
-        # 4. Fetch all results_events
+        # 4. Fetch all results_events with existing verification data
         cursor.execute("""
-        SELECT event_id, isin, company_name, nse_symbol, bse_code, board_meeting_date, event_status
+        SELECT event_id, isin, company_name, nse_symbol, bse_code, board_meeting_date, event_status,
+               actual_results_date, actual_results_time, source_document, verification_status
         FROM results_events
         ORDER BY board_meeting_date ASC, company_name ASC
         """)
@@ -203,6 +204,21 @@ def run_calendar_reconciliation():
                 "total": 0, "released": 0, "pending": 0, "postponed": 0, "scheduled": 0
             })
             date_bucket["total"] += 1
+
+            # Check 0: Preserve already-verified released events
+            if ev.get("event_status") == "Results Released" and ev.get("actual_results_date"):
+                stats_summary["released_count"] += 1
+                date_bucket["released"] += 1
+                updates.append((
+                    "Results Released",
+                    ev["actual_results_date"],
+                    ev.get("actual_results_time") or "18:00:00 IST",
+                    ev.get("source_document"),
+                    ev.get("verification_status") or "Verified (Official Exchange Filing)",
+                    None,
+                    eid
+                ))
+                continue
 
             # Check 1: Was this meeting officially POSTPONED / RESCHEDULED?
             if (isin, b_date) in OFFICIAL_POSTPONED_MEETINGS:
