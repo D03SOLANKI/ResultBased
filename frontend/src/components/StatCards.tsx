@@ -42,6 +42,8 @@ export const StatCards: React.FC<StatCardsProps> = ({
   const todayLabel = asOf.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
   const tomorrowObj = new Date(asOf.getTime() + 86400000);
   const tomorrowLabel = tomorrowObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  const d7Obj = new Date(asOf.getTime() + 7 * 86400000);
+  const d7Label = d7Obj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
   return (
     <div className="mb-5 space-y-3">
@@ -198,7 +200,7 @@ export const StatCards: React.FC<StatCardsProps> = ({
             </span>
           </div>
           <p className="mt-1 text-[11px] text-slate-500 truncate font-medium">
-            Through 09 November 2026
+            Through {d7Label}
           </p>
         </div>
 
