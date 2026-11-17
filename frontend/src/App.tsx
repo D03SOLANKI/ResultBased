@@ -97,10 +97,10 @@ export function App() {
 
   // Handle Calendar date selection
   const handleCalendarDateSelect = (dateStr: string) => {
-    setSelectedDate(dateStr);
+    setSelectedDate(prev => prev === dateStr ? null : dateStr);
     setQuickFilter('');
     setPage(1);
-    setActiveTab('table');
+    setActiveTab(prev => (prev === 'calendar' ? 'calendar' : 'table'));
   };
 
   // Handle Sync action

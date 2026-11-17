@@ -56,14 +56,46 @@ export const CompanyTable: React.FC<CompanyTableProps> = ({
   onSelectCompany,
   isLoading
 }) => {
-  const exportToCSV = () => {
-    if (!events.length) return;
+  const exportToCSV = async () => {
+    if (!events.length && total === 0) return;
+
+    let datasetToExport = events;
+    if (total > events.length) {
+      try {
+        const params = new URLSearchParams();
+        if (quickFilter.startsWith('Date: ')) {
+          const dt = quickFilter.replace('Date: ', '');
+          params.append('date_from', dt);
+          params.append('date_to', dt);
+        } else if (quickFilter) {
+          params.append('quick_filter', quickFilter);
+        }
+        if (exchangeFilter) params.append('exchange', exchangeFilter);
+        if (mcapFilter) params.append('market_cap', mcapFilter);
+        if (resultCategoryFilter) params.append('result_category', resultCategoryFilter);
+        if (search) params.append('search', search);
+        params.append('limit', Math.min(total, 10000).toString());
+        params.append('sort_by', sortBy);
+        params.append('sort_order', sortOrder);
+
+        const res = await fetch(`/api/calendar/events?${params.toString()}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.events && data.events.length > 0) {
+            datasetToExport = data.events;
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch full dataset for export, exporting current page instead', err);
+      }
+    }
+
     const headers = [
       "Company Name", "ISIN", "NSE Symbol", "BSE Code", "Market Cap (Cr)",
       "Category", "Listing Segment", "Expected Results Date", "Results Scope", "Period", "Verification Status"
     ];
     const csvRows = [headers.join(",")];
-    events.forEach(e => {
+    datasetToExport.forEach(e => {
       csvRows.push([
         `"${e.company_name.replace(/"/g, '""')}"`,
         e.isin,
@@ -82,7 +114,7 @@ export const CompanyTable: React.FC<CompanyTableProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `financial_results_${quickFilter || 'schedule'}_${new Date().toISOString().split("T")[0]}.csv`);
+    link.setAttribute("download", `financial_results_${(quickFilter || 'schedule').replace(/[^a-zA-Z0-9_-]/g, '_')}_${new Date().toISOString().split("T")[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

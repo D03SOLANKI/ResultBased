@@ -465,7 +465,7 @@ def get_tracked_post_market_stocks(
             query += " AND market_cap_category = ?"
             params.append(market_cap)
 
-        if search:
+        if search and isinstance(search, str) and search.strip():
             query += " AND (company_name LIKE ? OR nse_symbol LIKE ? OR bse_code LIKE ? OR isin LIKE ?)"
             s = f"%{search.strip()}%"
             params.extend([s, s, s, s])

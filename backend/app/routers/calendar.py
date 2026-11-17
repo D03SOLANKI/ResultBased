@@ -37,6 +37,22 @@ def get_calendar_dates(from_date: Optional[str] = None, to_date: Optional[str] =
         rows = [dict(r) for r in cursor.fetchall()]
     return rows
 
+@router.post("/sync")
+def sync_calendar():
+    """
+    Triggers live exchange synchronization and calendar reconciliation without wiping historical data.
+    """
+    from backend.app.services.realtime_surveillance import scan_and_update_released_results
+    from backend.app.services.calendar_reconciliation_engine import run_calendar_reconciliation
+    detected = scan_and_update_released_results()
+    recon_stats = run_calendar_reconciliation()
+    return {
+        "status": "success",
+        "message": "Live exchange sync and reconciliation completed successfully",
+        "newly_detected_results": detected,
+        "reconciliation": recon_stats
+    }
+
 @router.get("/events")
 def get_events(
     quick_filter: Optional[str] = Query(None, description="today, tomorrow, 7d, 30d, released, all"),
@@ -97,6 +113,10 @@ def get_events(
     elif quick_filter == "postponed_releases":
         # Postponed/rescheduled meetings
         conditions.append("e.event_status = 'Results Postponed'")
+    elif quick_filter == "all":
+        # All Upcoming Results: all results scheduled from today onwards
+        conditions.append("e.board_meeting_date >= ?")
+        params.append(base_date)
     elif quick_filter in ["released", "released_all"]:
         conditions.append("e.event_status = 'Results Released'")
     else:

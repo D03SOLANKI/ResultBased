@@ -86,6 +86,30 @@ def generate_daily_report(target_date_str=None):
         cursor.execute("SELECT count(*) as c FROM results_events WHERE event_status = 'Cancelled'")
         cancelled_count = cursor.fetchone()["c"]
 
+        # Rolling 7-day window stats
+        d7_ago_str = (target_date - timedelta(days=7)).strftime("%Y-%m-%d")
+        cursor.execute("""
+            SELECT count(*) as c FROM results_events 
+            WHERE event_status = 'Results Released' 
+            AND COALESCE(actual_results_date, board_meeting_date) >= ? 
+            AND COALESCE(actual_results_date, board_meeting_date) < ?
+        """, (d7_ago_str, t_str))
+        released_7d_count = cursor.fetchone()["c"]
+
+        cursor.execute("""
+            SELECT count(*) as c FROM results_events 
+            WHERE event_status = 'Results Pending' 
+            AND board_meeting_date >= ? AND board_meeting_date < ?
+        """, (d7_ago_str, t_str))
+        pending_7d_count = cursor.fetchone()["c"]
+
+        cursor.execute("""
+            SELECT count(*) as c FROM results_events 
+            WHERE event_status = 'Results Postponed' 
+            AND board_meeting_date >= ? AND board_meeting_date < ?
+        """, (d7_ago_str, t_str))
+        postponed_7d_count = cursor.fetchone()["c"]
+
     # Build WhatsApp / Telegram text format
     formatted_date = target_date.strftime("%d %B %Y")
     lines = []
@@ -99,6 +123,7 @@ def generate_daily_report(target_date_str=None):
     lines.append(f"📅 *SCHEDULED TOMORROW:* {tomorrow_count}")
     lines.append(f"📈 *UPCOMING NEXT 7 DAYS:* {next7_count}")
     lines.append(f"🗓️ *UPCOMING NEXT 30 DAYS:* {next30_count}")
+    lines.append(f"📋 *PREVIOUS RELEASES (ROLLING 7D):* {released_7d_count}")
     lines.append("═" * 32)
     lines.append("")
 
@@ -142,13 +167,14 @@ def generate_daily_report(target_date_str=None):
 
     lines.append("─" * 32)
     lines.append("⚡ *SCHEDULE INTEGRITY & SURVEILLANCE*")
+    lines.append(f"• Results Released (Rolling 7D): {released_7d_count}")
+    lines.append(f"• Filings Pending Verification: {pending_7d_count}")
+    lines.append(f"• Postponed / Rescheduled: {postponed_7d_count}")
     lines.append(f"• Newly Announced (Last 24h): {newly_count}")
-    lines.append(f"• Revised / Postponed: {revised_count}")
     lines.append(f"• Cancelled Meetings: {cancelled_count}")
-    lines.append(f"• Pending Verification / Conflicts: 0")
     lines.append("")
     lines.append("═" * 32)
-    lines.append("🔗 Access Live Interactive Dashboard: http://localhost:5173")
+    lines.append("🔗 Access Live Interactive Dashboard: https://resultbased.onrender.com")
 
     text_report = "\n".join(lines)
 

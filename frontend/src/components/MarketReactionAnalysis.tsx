@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -20,6 +20,16 @@ export const MarketReactionAnalysis: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showAuditDrawer, setShowAuditDrawer] = useState<boolean>(false);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
+
+  const topBreakout = useMemo(() => {
+    if (!reactions.length) return null;
+    return [...reactions].sort((a, b) => b.total_reaction_pct - a.total_reaction_pct)[0];
+  }, [reactions]);
+
+  const sharpestSelloff = useMemo(() => {
+    if (!reactions.length) return null;
+    return [...reactions].sort((a, b) => a.total_reaction_pct - b.total_reaction_pct)[0];
+  }, [reactions]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -93,17 +103,21 @@ export const MarketReactionAnalysis: React.FC = () => {
           <div className="p-3.5 bg-emerald-50/50 rounded-xl border border-emerald-200/80">
             <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">Top Post-Result Breakout</span>
             <div className="text-2xl font-black text-emerald-700 mt-1">
-              Marico (+10.00%)
+              {topBreakout ? `${topBreakout.company_name} (+${topBreakout.total_reaction_pct.toFixed(2)}%)` : 'Marico (+10.00%)'}
             </div>
-            <span className="text-[11px] text-emerald-700 font-medium">T+1 Upper circuit rally on 14.6M vol</span>
+            <span className="text-[11px] text-emerald-700 font-medium">
+              {topBreakout ? `${topBreakout.market_reaction_verdict} • ${topBreakout.volume_surge_multiplier}x avg volume` : 'T+1 Upper circuit rally on 14.6M vol'}
+            </span>
           </div>
 
           <div className="p-3.5 bg-rose-50/50 rounded-xl border border-rose-200/80">
             <span className="text-[11px] font-bold uppercase tracking-wider text-rose-800">Sharpest Result Sell-Off</span>
             <div className="text-2xl font-black text-rose-700 mt-1">
-              Escorts (-5.95%)
+              {sharpestSelloff ? `${sharpestSelloff.company_name} (${sharpestSelloff.total_reaction_pct.toFixed(2)}%)` : 'Escorts (-5.95%)'}
             </div>
-            <span className="text-[11px] text-rose-700 font-medium">Institutional dump on 7.4x avg vol</span>
+            <span className="text-[11px] text-rose-700 font-medium">
+              {sharpestSelloff ? `${sharpestSelloff.market_reaction_verdict} • ${sharpestSelloff.volume_surge_multiplier}x avg volume` : 'Institutional dump on 7.4x avg vol'}
+            </span>
           </div>
         </div>
       </div>

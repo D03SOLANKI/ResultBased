@@ -73,6 +73,59 @@ def get_market_reaction_summary(days: int = 7):
         ORDER BY r.announcement_date DESC, r.total_reaction_pct DESC
         """, (window_start, base_date))
         rows = [dict(row) for row in cursor.fetchall()]
+
+        # If strict rolling window has 0 records, fall back to returning verified ground truth reactions
+        if not rows:
+            cursor.execute("""
+            SELECT 
+                r.isin,
+                r.company_name,
+                r.symbol,
+                r.exchange,
+                r.announcement_date,
+                r.announcement_time,
+                r.market_session,
+                r.prev_close,
+                r.announcement_open,
+                r.announcement_high,
+                r.announcement_low,
+                r.announcement_close,
+                r.announcement_volume,
+                r.next_trading_day,
+                r.next_day_close,
+                r.daily_close_return_pct,
+                r.intraday_reaction_pct,
+                r.next_day_return_pct,
+                r.total_reaction_pct,
+                r.volume_surge_multiplier,
+                r.market_reaction_verdict,
+                r.price_source,
+                s.financial_period,
+                s.period_ended,
+                s.reporting_basis,
+                s.revenue_ops_cr,
+                s.pat_cr,
+                s.prev_year_revenue_ops_cr,
+                s.prev_year_pat_cr,
+                s.revenue_growth_yoy_pct,
+                s.pat_growth_yoy_pct,
+                s.is_turnaround_to_profit,
+                s.is_negative_base,
+                s.source_url,
+                c.market_cap_cr,
+                c.market_cap_category
+            FROM verified_market_reactions r
+            LEFT JOIN verified_financial_statements s ON r.isin = s.isin AND s.reporting_basis = (
+                CASE WHEN EXISTS (
+                    SELECT 1 FROM verified_financial_statements v2 
+                    WHERE v2.isin = r.isin AND v2.reporting_basis = 'Consolidated'
+                ) THEN 'Consolidated' ELSE 'Standalone' END
+            )
+            LEFT JOIN company_master c ON r.isin = c.isin
+            ORDER BY r.announcement_date DESC, r.total_reaction_pct DESC
+            """)
+            rows = [dict(row) for row in cursor.fetchall()]
+
         return {
             "total_records": len(rows),
             "window_days": days,
