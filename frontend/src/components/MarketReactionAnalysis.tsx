@@ -10,7 +10,12 @@ import {
   BarChart2, 
   ChevronDown, 
   ChevronUp,
-  FileText
+  FileText,
+  Search,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  X
 } from 'lucide-react';
 import { MarketReactionItem, AuditDiscrepancyItem } from '../types';
 
@@ -20,6 +25,9 @@ export const MarketReactionAnalysis: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showAuditDrawer, setShowAuditDrawer] = useState<boolean>(false);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [search, setSearch] = useState<string>('');
+  const [page, setPage] = useState<number>(1);
+  const pageSize = 50;
 
   const topBreakout = useMemo(() => {
     if (!reactions.length) return null;
@@ -30,6 +38,10 @@ export const MarketReactionAnalysis: React.FC = () => {
     if (!reactions.length) return null;
     return [...reactions].sort((a, b) => a.total_reaction_pct - b.total_reaction_pct)[0];
   }, [reactions]);
+
+  const positiveCount = useMemo(() => reactions.filter(r => r.total_reaction_pct > 1.0).length, [reactions]);
+  const negativeCount = useMemo(() => reactions.filter(r => r.total_reaction_pct < -1.0).length, [reactions]);
+  const turnaroundCount = useMemo(() => reactions.filter(r => r.is_turnaround_to_profit === 1).length, [reactions]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -48,12 +60,65 @@ export const MarketReactionAnalysis: React.FC = () => {
       });
   }, []);
 
-  const filteredReactions = reactions.filter(r => {
-    if (selectedFilter === 'positive') return r.total_reaction_pct > 1.0;
-    if (selectedFilter === 'negative') return r.total_reaction_pct < -1.0;
-    if (selectedFilter === 'turnaround') return r.is_turnaround_to_profit === 1;
-    return true;
-  });
+  const filteredReactions = useMemo(() => {
+    return reactions.filter(r => {
+      if (selectedFilter === 'positive' && r.total_reaction_pct <= 1.0) return false;
+      if (selectedFilter === 'negative' && r.total_reaction_pct >= -1.0) return false;
+      if (selectedFilter === 'turnaround' && r.is_turnaround_to_profit !== 1) return false;
+
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        const mName = r.company_name?.toLowerCase().includes(q);
+        const mSym = r.symbol?.toLowerCase().includes(q);
+        const mIsin = r.isin?.toLowerCase().includes(q);
+        if (!mName && !mSym && !mIsin) return false;
+      }
+      return true;
+    });
+  }, [reactions, selectedFilter, search]);
+
+  const totalPages = Math.ceil(filteredReactions.length / pageSize) || 1;
+  const paginatedReactions = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredReactions.slice(start, start + pageSize);
+  }, [filteredReactions, page, pageSize]);
+
+  const exportReactionsToCSV = () => {
+    if (!filteredReactions.length) return;
+    const headers = [
+      "Company Name", "ISIN", "Symbol", "Exchange", "Announcement Date",
+      "Filing Time", "Market Session", "Prev Close", "Close", "Total Return (%)",
+      "Volume Surge Multiplier", "Market Verdict", "YoY Rev Growth (%)", "YoY PAT Growth (%)", "Filing URL"
+    ];
+    const rows = [headers.join(",")];
+    filteredReactions.forEach(r => {
+      rows.push([
+        `"${(r.company_name || "").replace(/"/g, '""')}"`,
+        r.isin,
+        r.symbol,
+        r.exchange,
+        r.announcement_date,
+        r.announcement_time || "",
+        r.market_session,
+        r.prev_close,
+        r.announcement_close,
+        r.total_reaction_pct,
+        r.volume_surge_multiplier,
+        `"${r.market_reaction_verdict || ""}"`,
+        r.revenue_growth_yoy_pct || "",
+        r.pat_growth_yoy_pct || "",
+        `"${r.source_url || ""}"`
+      ].join(","));
+    });
+    const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `market_reactions_rolling_7d_${selectedFilter}_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="space-y-6">
@@ -182,48 +247,81 @@ export const MarketReactionAnalysis: React.FC = () => {
         </div>
       )}
 
-      {/* Filter Tabs */}
-      <div className="flex items-center space-x-2">
-        <button
-          onClick={() => setSelectedFilter('all')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
-            selectedFilter === 'all'
-              ? 'bg-slate-900 text-white shadow-xs'
-              : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
-          }`}
-        >
-          All Released Companies ({reactions.length})
-        </button>
-        <button
-          onClick={() => setSelectedFilter('positive')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
-            selectedFilter === 'positive'
-              ? 'bg-slate-900 text-white shadow-xs'
-              : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
-          }`}
-        >
-          Positive Market Reactions
-        </button>
-        <button
-          onClick={() => setSelectedFilter('negative')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
-            selectedFilter === 'negative'
-              ? 'bg-slate-900 text-white shadow-xs'
-              : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
-          }`}
-        >
-          Negative Reactions / Dips
-        </button>
-        <button
-          onClick={() => setSelectedFilter('turnaround')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
-            selectedFilter === 'turnaround'
-              ? 'bg-slate-900 text-white shadow-xs'
-              : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
-          }`}
-        >
-          Turnaround Companies
-        </button>
+      {/* Controls & Filter Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => { setSelectedFilter('all'); setPage(1); }}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+              selectedFilter === 'all'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+            }`}
+          >
+            All Released Companies ({reactions.length})
+          </button>
+          <button
+            onClick={() => { setSelectedFilter('positive'); setPage(1); }}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+              selectedFilter === 'positive'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+            }`}
+          >
+            Positive Reactions ({positiveCount})
+          </button>
+          <button
+            onClick={() => { setSelectedFilter('negative'); setPage(1); }}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+              selectedFilter === 'negative'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+            }`}
+          >
+            Negative Dips ({negativeCount})
+          </button>
+          <button
+            onClick={() => { setSelectedFilter('turnaround'); setPage(1); }}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+              selectedFilter === 'turnaround'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+            }`}
+          >
+            Turnarounds ({turnaroundCount})
+          </button>
+        </div>
+
+        {/* Search & Export Actions */}
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              placeholder="Search 2,163 companies..."
+              className="pl-8 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent w-48 sm:w-60"
+            />
+            {search && (
+              <button
+                onClick={() => { setSearch(''); setPage(1); }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+          <button
+            onClick={exportReactionsToCSV}
+            title="Download CSV of filtered market reactions"
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 transition shadow-2xs"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-600" />
+            <span className="hidden sm:inline">Export CSV</span>
+          </button>
+        </div>
       </div>
 
       {/* Side-by-Side Analysis Table */}
@@ -252,13 +350,20 @@ export const MarketReactionAnalysis: React.FC = () => {
                     </div>
                   </td>
                 </tr>
-              ) : filteredReactions.map((r) => {
+              ) : paginatedReactions.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-12 text-center text-slate-500">
+                    <p className="text-sm font-semibold">No companies match your search or filter criteria.</p>
+                    <p className="text-xs text-slate-400 mt-1">Try clearing the search query or selecting "All Released Companies".</p>
+                  </td>
+                </tr>
+              ) : paginatedReactions.map((r) => {
                 const isPositive = r.total_reaction_pct > 0;
                 const isSellOff = r.total_reaction_pct < -2.0;
                 const isBreakout = r.total_reaction_pct >= 5.0;
 
                 return (
-                  <tr key={r.isin} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={`${r.isin}-${r.announcement_date}`} className="hover:bg-slate-50/80 transition-colors">
                     
                     {/* Company & Identifiers */}
                     <td className="py-3.5 px-4">
@@ -405,6 +510,38 @@ export const MarketReactionAnalysis: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Footer */}
+        {filteredReactions.length > 0 && (
+          <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+            <div>
+              Showing <span className="font-bold text-slate-900">{(page - 1) * pageSize + 1}</span> to{' '}
+              <span className="font-bold text-slate-900">{Math.min(page * pageSize, filteredReactions.length)}</span> of{' '}
+              <span className="font-bold text-slate-900">{filteredReactions.length}</span> companies
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center space-x-1"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+                <span>Prev</span>
+              </button>
+              <span className="px-2 font-mono font-bold text-slate-800">
+                Page {page} of {totalPages}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center space-x-1"
+              >
+                <span>Next</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
     </div>
