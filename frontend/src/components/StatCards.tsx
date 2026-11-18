@@ -4,8 +4,7 @@ import {
   Clock, 
   Layers, 
   Flame, 
-  ArrowUpRight,
-  ShieldCheck
+  ArrowUpRight
 } from 'lucide-react';
 import { OverviewStats } from '../types';
 
@@ -47,19 +46,6 @@ export const StatCards: React.FC<StatCardsProps> = ({
 
   return (
     <div className="mb-5 space-y-3">
-      {/* Scope Disclaimer / Assurance Pill */}
-      <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl px-3.5 py-2 flex items-center justify-between text-xs text-emerald-900 shadow-xs">
-        <div className="flex items-center space-x-2">
-          <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
-          <span className="font-medium">
-            <strong>Exclusively Financial Results & Performance Announcements:</strong> Tracking Quarterly (Q1-Q4), Half-Yearly (H1/H2), Annual Audited Results & Monthly Performance Updates. Non-financial corporate announcements are excluded.
-          </span>
-        </div>
-        <span className="hidden md:inline-block text-[11px] font-bold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-md">
-          SEBI Reg 33 & 29
-        </span>
-      </div>
-
       {/* 4 Minimalist Primary Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
         

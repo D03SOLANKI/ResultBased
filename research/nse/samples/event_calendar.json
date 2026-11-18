@@ -5850,5 +5850,61 @@
     "purpose": "Financial Results",
     "bm_desc": "To consider and approve the financial results for the half year ended September 30, 2026",
     "date": "17-Nov-2026"
+  },
+  {
+    "symbol": "ANSALAPI",
+    "company": "Ansal Properties & Infrastructure Limited",
+    "purpose": "Financial Results",
+    "bm_desc": "To consider and approve Q2 unaudited financial results",
+    "date": "18-Nov-2026"
+  },
+  {
+    "symbol": "BLSPOLY",
+    "company": "BLS Polymers Limited",
+    "purpose": "Financial Results",
+    "bm_desc": "To consider and approve Q2 financial results",
+    "date": "18-Nov-2026"
+  },
+  {
+    "symbol": "KONSTELEC",
+    "company": "Konstelec Engineers Limited",
+    "purpose": "Financial Results",
+    "bm_desc": "To consider and approve Half-Yearly financial results",
+    "date": "18-Nov-2026"
+  },
+  {
+    "symbol": "SABAR",
+    "company": "Sabar Flex India Limited",
+    "purpose": "Financial Results",
+    "bm_desc": "To consider and approve Half-Yearly financial results",
+    "date": "18-Nov-2026"
+  },
+  {
+    "symbol": "MUTHOOTMF",
+    "company": "Muthoot Microfin Limited",
+    "purpose": "Financial Results",
+    "bm_desc": "To consider and approve Audited/Quarterly financial results",
+    "date": "19-Nov-2026"
+  },
+  {
+    "symbol": "ANTGRAPHIC",
+    "company": "Antarctica Limited",
+    "purpose": "Financial Results",
+    "bm_desc": "To consider and approve Q2 financial results",
+    "date": "19-Nov-2026"
+  },
+  {
+    "symbol": "VALECHAENG",
+    "company": "Valecha Engineering Limited",
+    "purpose": "Financial Results",
+    "bm_desc": "To consider and approve Q2 financial results",
+    "date": "20-Nov-2026"
+  },
+  {
+    "symbol": "ASIANTILES",
+    "company": "Asian Granito India Limited",
+    "purpose": "Financial Results",
+    "bm_desc": "To consider and approve Q2 financial results",
+    "date": "21-Nov-2026"
   }
 ]
