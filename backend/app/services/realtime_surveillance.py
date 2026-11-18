@@ -187,8 +187,26 @@ def _surveillance_loop(interval_sec=30):
     surveillance_state.is_active = True
     surveillance_state.add_log("SYSTEM", f"Surveillance loop running in background (every {interval_sec}s).")
     
+    last_reconciled_date = datetime.now().strftime("%Y-%m-%d")
+    poll_count = 0
+
     while not _stop_event.is_set():
         try:
+            current_date = datetime.now().strftime("%Y-%m-%d")
+            
+            # Autonomous Daily Rollover: automatically reconcile and shift dates on midnight transition
+            if current_date != last_reconciled_date:
+                surveillance_state.add_log("ROLLOVER", f"Autonomous Day Rollover: {last_reconciled_date} -> {current_date}. Auto-reconciling calendar...")
+                from backend.app.services.calendar_reconciliation_engine import run_calendar_reconciliation
+                run_calendar_reconciliation()
+                last_reconciled_date = current_date
+
+            # Autonomous Periodic Health Reconciliation (every 30 mins / 60 polls)
+            poll_count += 1
+            if poll_count % 60 == 0:
+                from backend.app.services.calendar_reconciliation_engine import run_calendar_reconciliation
+                run_calendar_reconciliation()
+
             scan_no = surveillance_state.scan_count + 1
             surveillance_state.add_log("POLL", f"Poll #{scan_no}: Scanning NSE NEAPS & BSE Corporate Announcement streams...")
             detected = scan_and_update_released_results()
