@@ -207,6 +207,20 @@ def _surveillance_loop(interval_sec=30):
                 from backend.app.services.calendar_reconciliation_engine import run_calendar_reconciliation
                 run_calendar_reconciliation()
 
+            # Autonomous Daily Post-Market Bhavcopy Sync (after 16:30 IST)
+            now = datetime.now()
+            if now.hour >= 16 and (now.hour > 16 or now.minute >= 30) and poll_count % 120 == 0:
+                try:
+                    from backend.app.services.bhavcopy_engine import download_daily_bhavcopy, reconcile_market_reactions_from_bhavcopy
+                    from backend.app.database import get_db
+                    surveillance_state.add_log("BHAVCOPY", "Autonomous Post-Market Sync: Downloading today's official BSE/NSE Bhavcopy...")
+                    download_daily_bhavcopy(now.date())
+                    with get_db() as conn:
+                        reconciled = reconcile_market_reactions_from_bhavcopy(conn)
+                        surveillance_state.add_log("BHAVCOPY", f"Bhavcopy reconciliation complete: {reconciled} reactions verified.")
+                except Exception as b_err:
+                    surveillance_state.add_log("BHAVCOPY_ERR", f"Bhavcopy sync check: {str(b_err)}")
+
             scan_no = surveillance_state.scan_count + 1
             surveillance_state.add_log("POLL", f"Poll #{scan_no}: Scanning NSE NEAPS & BSE Corporate Announcement streams...")
             detected = scan_and_update_released_results()
