@@ -209,6 +209,10 @@ export interface MarketReactionItem {
   market_cap_cr: number | null;
   market_cap_category: string | null;
   financial_verification_status?: string;
+  divergence_category?: string;
+  reaction_rationale?: string;
+  margin_change_yoy_bps?: number | null;
+  ebitda_margin_pct?: number | null;
 }
 
 export interface FinancialAuditRecordItem {

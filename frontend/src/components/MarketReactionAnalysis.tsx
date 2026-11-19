@@ -50,9 +50,17 @@ export const MarketReactionAnalysis: React.FC = () => {
     return [...reactions].sort((a, b) => a.total_reaction_pct - b.total_reaction_pct)[0];
   }, [reactions]);
 
+  const topDivergent = useMemo(() => {
+    return reactions.find(r => r.divergence_category === 'DIVERGENT_SELL_THE_NEWS' || r.divergence_category === 'DIVERGENT_BETTER_THAN_FEARED');
+  }, [reactions]);
+
   const positiveCount = useMemo(() => reactions.filter(r => r.total_reaction_pct > 1.0).length, [reactions]);
   const negativeCount = useMemo(() => reactions.filter(r => r.total_reaction_pct < -1.0).length, [reactions]);
-  const turnaroundCount = useMemo(() => reactions.filter(r => r.is_turnaround_to_profit === 1).length, [reactions]);
+  const beatsCount = useMemo(() => reactions.filter(r => r.divergence_category === 'CONVERGENT_BEAT_ACCUMULATION').length, [reactions]);
+  const sellTheNewsCount = useMemo(() => reactions.filter(r => r.divergence_category === 'DIVERGENT_SELL_THE_NEWS').length, [reactions]);
+  const reliefRallyCount = useMemo(() => reactions.filter(r => r.divergence_category === 'DIVERGENT_BETTER_THAN_FEARED').length, [reactions]);
+  const marginSqueezeCount = useMemo(() => reactions.filter(r => r.divergence_category === 'DIVERGENT_MARGIN_COMPRESSION_SQUEEZE').length, [reactions]);
+  const turnaroundCount = useMemo(() => reactions.filter(r => r.divergence_category === 'DIVERGENT_TURNAROUND_RERATING' || r.is_turnaround_to_profit === 1).length, [reactions]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -85,7 +93,11 @@ export const MarketReactionAnalysis: React.FC = () => {
     return reactions.filter(r => {
       if (selectedFilter === 'positive' && r.total_reaction_pct <= 1.0) return false;
       if (selectedFilter === 'negative' && r.total_reaction_pct >= -1.0) return false;
-      if (selectedFilter === 'turnaround' && r.is_turnaround_to_profit !== 1) return false;
+      if (selectedFilter === 'beats' && r.divergence_category !== 'CONVERGENT_BEAT_ACCUMULATION') return false;
+      if (selectedFilter === 'sell_the_news' && r.divergence_category !== 'DIVERGENT_SELL_THE_NEWS') return false;
+      if (selectedFilter === 'relief_rally' && r.divergence_category !== 'DIVERGENT_BETTER_THAN_FEARED') return false;
+      if (selectedFilter === 'margin_squeeze' && r.divergence_category !== 'DIVERGENT_MARGIN_COMPRESSION_SQUEEZE') return false;
+      if (selectedFilter === 'turnaround' && !(r.divergence_category === 'DIVERGENT_TURNAROUND_RERATING' || r.is_turnaround_to_profit === 1)) return false;
 
       if (search.trim()) {
         const q = search.toLowerCase();
@@ -436,40 +448,60 @@ export const MarketReactionAnalysis: React.FC = () => {
       {/* Controls & Filter Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         {/* Filter Tabs */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <button
             onClick={() => { setSelectedFilter('all'); setPage(1); }}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+            className={`px-2.5 py-1 text-xs font-bold rounded-lg transition ${
               selectedFilter === 'all'
                 ? 'bg-slate-900 text-white shadow-xs'
                 : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
             }`}
           >
-            All Released Companies ({reactions.length})
+            All ({reactions.length})
           </button>
           <button
-            onClick={() => { setSelectedFilter('positive'); setPage(1); }}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
-              selectedFilter === 'positive'
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+            onClick={() => { setSelectedFilter('beats'); setPage(1); }}
+            className={`px-2.5 py-1 text-xs font-bold rounded-lg transition ${
+              selectedFilter === 'beats'
+                ? 'bg-emerald-800 text-white shadow-xs'
+                : 'bg-white text-emerald-800 hover:bg-emerald-50 border border-emerald-200'
             }`}
           >
-            Positive Reactions ({positiveCount})
+            Earnings Beats ({beatsCount})
           </button>
           <button
-            onClick={() => { setSelectedFilter('negative'); setPage(1); }}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
-              selectedFilter === 'negative'
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+            onClick={() => { setSelectedFilter('sell_the_news'); setPage(1); }}
+            className={`px-2.5 py-1 text-xs font-bold rounded-lg transition ${
+              selectedFilter === 'sell_the_news'
+                ? 'bg-amber-800 text-white shadow-xs'
+                : 'bg-white text-amber-900 hover:bg-amber-50 border border-amber-300'
             }`}
           >
-            Negative Dips ({negativeCount})
+            Sell-the-News ({sellTheNewsCount})
+          </button>
+          <button
+            onClick={() => { setSelectedFilter('relief_rally'); setPage(1); }}
+            className={`px-2.5 py-1 text-xs font-bold rounded-lg transition ${
+              selectedFilter === 'relief_rally'
+                ? 'bg-purple-800 text-white shadow-xs'
+                : 'bg-white text-purple-900 hover:bg-purple-50 border border-purple-200'
+            }`}
+          >
+            Relief Rallies ({reliefRallyCount})
+          </button>
+          <button
+            onClick={() => { setSelectedFilter('margin_squeeze'); setPage(1); }}
+            className={`px-2.5 py-1 text-xs font-bold rounded-lg transition ${
+              selectedFilter === 'margin_squeeze'
+                ? 'bg-rose-800 text-white shadow-xs'
+                : 'bg-white text-rose-900 hover:bg-rose-50 border border-rose-300'
+            }`}
+          >
+            Margin Squeeze ({marginSqueezeCount})
           </button>
           <button
             onClick={() => { setSelectedFilter('turnaround'); setPage(1); }}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+            className={`px-2.5 py-1 text-xs font-bold rounded-lg transition ${
               selectedFilter === 'turnaround'
                 ? 'bg-slate-900 text-white shadow-xs'
                 : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
@@ -672,7 +704,7 @@ export const MarketReactionAnalysis: React.FC = () => {
 
                     {/* Actual Market Reaction */}
                     <td className="py-3.5 px-4">
-                      <div className="flex items-center space-x-1.5">
+                      <div className="flex flex-wrap items-center gap-1.5">
                         <span className={`px-2 py-0.5 rounded font-mono text-xs font-black border ${
                           isBreakout 
                             ? 'bg-emerald-600 text-white border-emerald-700'
@@ -684,15 +716,39 @@ export const MarketReactionAnalysis: React.FC = () => {
                         }`}>
                           {r.total_reaction_pct > 0 ? '+' : ''}{r.total_reaction_pct.toFixed(2)}%
                         </span>
+                        {r.divergence_category?.startsWith('DIVERGENT') && (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
+                            Divergent
+                          </span>
+                        )}
+                        {r.divergence_category?.startsWith('CONVERGENT') && (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-blue-100 text-blue-900 border border-blue-300">
+                            Convergent
+                          </span>
+                        )}
                       </div>
-                      <div className="text-[10px] font-bold text-slate-700 mt-1">
+                      <div className="text-[11px] font-bold text-slate-900 mt-1">
                         {r.market_reaction_verdict}
                       </div>
-                      {r.market_session === 'Post-Market Hours' && (
-                        <span className="text-[9px] text-slate-400 block font-mono">
-                          (Reflected T+1 Next-Day Session)
-                        </span>
+                      {r.reaction_rationale && (
+                        <p className="text-[10px] text-slate-500 mt-1 line-clamp-2 max-w-sm leading-tight font-sans" title={r.reaction_rationale}>
+                          {r.reaction_rationale}
+                        </p>
                       )}
+                      <div className="flex items-center gap-1.5 mt-1 font-mono text-[9px]">
+                        {r.margin_change_yoy_bps !== null && r.margin_change_yoy_bps !== undefined && (
+                          <span className={`font-bold px-1.5 py-0.2 rounded border ${
+                            r.margin_change_yoy_bps >= 0 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'
+                          }`}>
+                            Margin: {r.margin_change_yoy_bps > 0 ? '+' : ''}{r.margin_change_yoy_bps} bps
+                          </span>
+                        )}
+                        {r.market_session === 'Post-Market Hours' && (
+                          <span className="text-slate-400">
+                            (Reflected T+1 Next-Day)
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     {/* Volume & Liquidity */}
