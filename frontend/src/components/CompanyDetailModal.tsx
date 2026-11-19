@@ -275,7 +275,7 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
                       <tr className="hover:bg-slate-50/60">
                         <td className="py-2.5 px-3 font-bold text-slate-900">Revenue from Operations</td>
                         <td className="py-2.5 px-3 font-mono font-bold text-slate-900 bg-slate-50/40">
-                          ₹{lp.revenue_cr.toLocaleString()} Cr
+                          {lp.revenue_cr !== null && lp.revenue_cr !== undefined ? `₹${lp.revenue_cr.toLocaleString()} Cr` : <span className="text-amber-700 italic">Pending XBRL Extraction</span>}
                         </td>
                         <td className="py-2.5 px-3 font-mono text-slate-600">
                           {comp.sequential_qoq?.previous_revenue_cr ? `₹${comp.sequential_qoq.previous_revenue_cr.toLocaleString()} Cr` : '-'}
@@ -309,7 +309,7 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
                       <tr className="hover:bg-slate-50/60 bg-emerald-50/20">
                         <td className="py-2.5 px-3 font-bold text-slate-900">Profit After Tax (PAT)</td>
                         <td className="py-2.5 px-3 font-mono font-extrabold text-slate-900 bg-emerald-50/40">
-                          ₹{lp.pat_cr.toLocaleString()} Cr
+                          {lp.pat_cr !== null && lp.pat_cr !== undefined ? `₹${lp.pat_cr.toLocaleString()} Cr` : <span className="text-amber-700 italic">Pending XBRL Extraction</span>}
                         </td>
                         <td className="py-2.5 px-3 font-mono text-slate-600">
                           {comp.sequential_qoq?.previous_pat_cr !== null && comp.sequential_qoq?.previous_pat_cr !== undefined

@@ -7,6 +7,7 @@ from backend.app.database import init_db
 from backend.app.routers import stats, calendar, companies, announcements, report, performance, post_market_tracker
 from backend.app.services.realtime_surveillance import start_surveillance_worker, stop_surveillance_worker
 from backend.app.services.financial_statement_verifier import execute_full_verification_and_seeding
+from backend.app.services.financial_data_auditor import run_comprehensive_financial_audit
 from backend.app.services.post_market_engine import seed_post_market_tracker_data
 from backend.app.services.calendar_reconciliation_engine import run_calendar_reconciliation
 
@@ -38,6 +39,7 @@ app.include_router(post_market_tracker.router)
 def on_startup():
     init_db()
     execute_full_verification_and_seeding()
+    run_comprehensive_financial_audit()
     seed_post_market_tracker_data()
     run_calendar_reconciliation()
     start_surveillance_worker(interval_sec=30)

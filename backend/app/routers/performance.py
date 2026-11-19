@@ -59,6 +59,7 @@ def get_market_reaction_summary(days: int = 7):
             s.is_turnaround_to_profit,
             s.is_negative_base,
             s.source_url,
+            s.verification_status as financial_verification_status,
             c.market_cap_cr,
             c.market_cap_category
         FROM verified_market_reactions r
@@ -112,6 +113,7 @@ def get_market_reaction_summary(days: int = 7):
                 s.is_turnaround_to_profit,
                 s.is_negative_base,
                 s.source_url,
+                s.verification_status as financial_verification_status,
                 c.market_cap_cr,
                 c.market_cap_category
             FROM verified_market_reactions r
@@ -163,6 +165,61 @@ def get_audit_discrepancies():
         return {
             "total_discrepancies_audited": len(logs),
             "audit_trail": logs
+        }
+
+@router.get("/audit/financial-discrepancies")
+def get_financial_audit_discrepancies():
+    """
+    Returns full forensic financial data audit records for all companies:
+    - Side-by-side comparison (Scanner Old Value vs Verified Ground Truth)
+    - Recalculated growth % vs Official reported growth %
+    - Verification status (VERIFIED, DISCREPANCY, UNVERIFIED_PENDING_XBRL)
+    - Primary source filing links (BSE/NSE PDF URLs)
+    - Discrepancy flags (CRITICAL_DISCREPANCY, BENCHMARK_VERIFIED, SYNTHETIC_ESTIMATE_PURGED)
+    """
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+        SELECT 
+            audit_id,
+            isin,
+            company_name,
+            symbol,
+            reporting_period,
+            financial_year,
+            reporting_basis,
+            metric_name,
+            current_official_value,
+            previous_official_value,
+            scanner_old_value,
+            recalculated_growth_pct,
+            official_reported_growth_pct,
+            difference_magnitude,
+            source_filing_url,
+            filing_date,
+            verification_status,
+            discrepancy_flag,
+            audit_notes,
+            audited_at
+        FROM financial_data_audit_records
+        ORDER BY 
+            CASE WHEN discrepancy_flag = 'CRITICAL_DISCREPANCY' THEN 1
+                 WHEN verification_status = 'VERIFIED' THEN 2
+                 ELSE 3 END,
+            audit_id ASC
+        """)
+        records = [dict(r) for r in cursor.fetchall()]
+        
+        verified_count = sum(1 for r in records if r["verification_status"] == "VERIFIED")
+        discrepancy_count = sum(1 for r in records if r["verification_status"] == "DISCREPANCY")
+        unverified_count = sum(1 for r in records if r["verification_status"] == "UNVERIFIED_PENDING_XBRL")
+        
+        return {
+            "total_audited_records": len(records),
+            "verified_official_count": verified_count,
+            "critical_discrepancies_count": discrepancy_count,
+            "unverified_pending_xbrl_count": unverified_count,
+            "records": records
         }
 
 @router.get("/{isin}")

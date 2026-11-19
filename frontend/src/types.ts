@@ -197,17 +197,41 @@ export interface MarketReactionItem {
   financial_period: string;
   period_ended: string;
   reporting_basis: string;
-  revenue_ops_cr: number;
-  pat_cr: number;
-  prev_year_revenue_ops_cr: number;
-  prev_year_pat_cr: number;
-  revenue_growth_yoy_pct: number;
-  pat_growth_yoy_pct: number;
+  revenue_ops_cr?: number | null;
+  pat_cr?: number | null;
+  prev_year_revenue_ops_cr?: number | null;
+  prev_year_pat_cr?: number | null;
+  revenue_growth_yoy_pct?: number | null;
+  pat_growth_yoy_pct?: number | null;
   is_turnaround_to_profit: number;
   is_negative_base: number;
   source_url: string;
   market_cap_cr: number | null;
   market_cap_category: string | null;
+  financial_verification_status?: string;
+}
+
+export interface FinancialAuditRecordItem {
+  audit_id: number;
+  isin: string;
+  company_name: string;
+  symbol: string;
+  reporting_period: string;
+  financial_year: string;
+  reporting_basis: string;
+  metric_name: string;
+  current_official_value: number | null;
+  previous_official_value: number | null;
+  scanner_old_value: number | null;
+  recalculated_growth_pct: number | null;
+  official_reported_growth_pct: number | null;
+  difference_magnitude: string;
+  source_filing_url: string;
+  filing_date: string;
+  verification_status: 'VERIFIED' | 'DISCREPANCY' | 'UNVERIFIED_PENDING_XBRL' | 'REVIEW_REQUIRED';
+  discrepancy_flag: string;
+  audit_notes: string;
+  audited_at: string;
 }
 
 export interface AuditDiscrepancyItem {
