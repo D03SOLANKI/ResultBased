@@ -238,6 +238,75 @@ export interface FinancialAuditRecordItem {
   audited_at: string;
 }
 
+export interface PreEarningsPredictionItem {
+  prediction_id: string;
+  isin: string;
+  symbol: string;
+  company_name: string;
+  exchange: string;
+  listing_segment: string;
+  market_cap_category: string | null;
+  board_meeting_date: string;
+  financial_period: string;
+  is_fno_eligible: number;
+  positive_probability_pct: number;
+  confidence_level: 'HIGH' | 'MEDIUM' | 'LOW';
+  confidence_score: number;
+  expected_direction: string;
+  ranking_score: number;
+  pillar1_operational_score: number;
+  pillar2_priced_in_score: number;
+  pillar3_delivery_score: number;
+  pillar4_fno_score?: number | null;
+  pillar5_peer_score: number;
+  pre_runup_15d_pct: number;
+  delivery_multiple_5d_vs_30d: number;
+  delivery_pct_5d: number;
+  pcr_oi?: number | null;
+  iv_skew?: number | null;
+  supporting_evidence: string[];
+  risk_factors: string[];
+  detailed_reasoning: string;
+  status: 'UPCOMING' | 'BACKTESTED';
+  actual_reaction_pct?: number | null;
+  actual_reaction_verdict?: string | null;
+  prediction_outcome?: 'HIT' | 'MISS' | 'PENDING';
+  brier_score?: number | null;
+}
+
+export interface PredictionSummary {
+  total_predictions: number;
+  upcoming_pipeline_count: number;
+  backtested_calibration_count: number;
+  high_conviction_count: number;
+  sell_the_news_count: number;
+  top_opportunity?: {
+    symbol: string;
+    company_name: string;
+    positive_probability_pct: number;
+    expected_direction: string;
+    board_meeting_date: string;
+  } | null;
+}
+
+export interface BacktestValidationMetrics {
+  total_backtested_announcements: number;
+  overall_accuracy_pct: number;
+  hits_count: number;
+  misses_count: number;
+  average_brier_score: number;
+  brier_score_verdict: string;
+  high_probability_tier: {
+    sample_size: number;
+    win_rate_pct: number;
+    average_post_earnings_gain_pct: number;
+  };
+  sell_the_news_protection: {
+    traps_identified: number;
+    successful_trap_avoidance_rate_pct: number;
+  };
+}
+
 export interface AuditDiscrepancyItem {
   log_id: number;
   isin: string;

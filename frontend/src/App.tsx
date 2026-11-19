@@ -7,6 +7,7 @@ import { DailyReportView } from './components/DailyReportView';
 import { AnnouncementMonitor } from './components/AnnouncementMonitor';
 import { CompanyDetailModal } from './components/CompanyDetailModal';
 import { MarketReactionAnalysis } from './components/MarketReactionAnalysis';
+import { PreEarningsPredictor } from './components/PreEarningsPredictor';
 import { PostMarketTracker } from './components/PostMarketTracker';
 import { LiveConsoleModal } from './components/LiveConsoleModal';
 import { OverviewStats, ResultEvent } from './types';
@@ -194,7 +195,14 @@ export function App() {
           </div>
         )}
 
-        {/* Tab 3: Post-Market Earnings Reaction Tracker */}
+        {/* Tab 3: Pre-Earnings Positive Market Reaction Prediction Engine */}
+        {activeTab === 'predictions' && (
+          <div className="animate-in fade-in duration-150">
+            <PreEarningsPredictor />
+          </div>
+        )}
+
+        {/* Tab 4: Post-Market Earnings Reaction Tracker */}
         {activeTab === 'post_market' && (
           <div className="animate-in fade-in duration-150">
             <PostMarketTracker />
