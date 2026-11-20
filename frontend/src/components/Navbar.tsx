@@ -9,10 +9,11 @@ import {
   TrendingUp,
   Moon,
   Terminal,
-  Sparkles
+  Sparkles,
+  History
 } from 'lucide-react';
 
-export type NavTab = 'table' | 'reaction' | 'predictions' | 'post_market' | 'calendar' | 'report' | 'announcements';
+export type NavTab = 'table' | 'reaction' | 'predictions' | 'blind_backtest' | 'post_market' | 'calendar' | 'report' | 'announcements';
 
 interface NavbarProps {
   activeTab: NavTab;
@@ -57,6 +58,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'table', label: 'Results Scanner', icon: <BarChart3 className="w-3.5 h-3.5" /> },
     { id: 'reaction', label: 'Results vs Market Reaction', icon: <TrendingUp className="w-3.5 h-3.5 text-blue-600" /> },
     { id: 'predictions', label: 'AI Prediction Engine', icon: <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" /> },
+    { id: 'blind_backtest', label: 'Blind Backtesting – Positive Market Reaction Engine', icon: <History className="w-3.5 h-3.5 text-purple-600" /> },
     { id: 'post_market', label: 'Post-Market Tracker', icon: <Moon className="w-3.5 h-3.5 text-indigo-500" /> },
     { id: 'calendar', label: 'Calendar', icon: <Calendar className="w-3.5 h-3.5 text-slate-500" /> },
     { id: 'report', label: '8 AM Report', icon: <FileText className="w-3.5 h-3.5 text-slate-500" /> },

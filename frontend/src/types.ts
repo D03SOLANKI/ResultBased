@@ -500,3 +500,116 @@ export interface StrategyAnalysisQuestion {
   verdict: string;
   details: string;
 }
+
+// ==========================================
+// BLIND HISTORICAL BACKTEST INTERFACES
+// ==========================================
+
+export interface BlindBacktestMetrics {
+  total_evaluated: number;
+  overall_accuracy_pct: number;
+  precision_pct: number;
+  recall_pct: number;
+  specificity_pct: number;
+  f1_score: number;
+  positive_win_rate_pct: number;
+  average_trade_return_pct: number;
+  max_drawdown_pct: number;
+  average_brier_score: number;
+  exclusions_count: number;
+}
+
+export interface BlindConfusionMatrix {
+  true_positives: number;
+  false_positives: number;
+  true_negatives: number;
+  false_negatives: number;
+  tp_pct: number;
+  fp_pct: number;
+  tn_pct: number;
+  fn_pct: number;
+}
+
+export interface BlindSectorBreakdown {
+  sector: string;
+  total_events: number;
+  correct_events: number;
+  accuracy_pct: number;
+  positive_preds: number;
+  tp_count: number;
+  avg_pos_return: number;
+  avg_alpha: number;
+}
+
+export interface BlindBacktestSummaryResponse {
+  status: string;
+  metrics: BlindBacktestMetrics;
+  confusion_matrix: BlindConfusionMatrix;
+  sector_breakdown: BlindSectorBreakdown[];
+}
+
+export interface BlindBacktestPredictionItem {
+  prediction_id: string;
+  symbol: string;
+  company_name: string;
+  sector: string;
+  exchange: string;
+  announcement_date: string;
+  announcement_timing: string;
+  prediction_timestamp: string;
+  predicted_direction: 'POSITIVE' | 'NEGATIVE';
+  positive_probability_pct: number;
+  confidence_level: 'HIGH' | 'MEDIUM' | 'LOW';
+  confidence_score: number;
+  predicted_reasoning: string;
+  pillar1_operational_score: number;
+  pillar2_priced_in_score: number;
+  pillar3_delivery_score: number;
+  pillar4_fno_score?: number | null;
+  pillar5_peer_score: number;
+  pre_runup_15d_pct: number;
+  pre_runup_5d_pct: number;
+  pre_vol_multiple_5d_vs_30d: number;
+  pre_rsi_14: number;
+  prediction_sha256_hash: string;
+  reaction_date: string;
+  prev_close_price: number;
+  reaction_open_price: number;
+  reaction_close_price: number;
+  next_day_close_price: number;
+  reaction_return_pct: number;
+  reaction_intraday_pct: number;
+  reaction_t1_return_pct: number;
+  nifty_benchmark_return_pct: number;
+  benchmark_adjusted_return_pct: number;
+  actual_reaction_verdict: 'POSITIVE' | 'NEGATIVE';
+  classification: 'TRUE_POSITIVE' | 'FALSE_POSITIVE' | 'TRUE_NEGATIVE' | 'FALSE_NEGATIVE';
+  is_correct: number;
+  brier_score: number;
+  revealed_at: string;
+  features_snapshot?: Record<string, any>;
+}
+
+export interface BlindEquityCurvePoint {
+  trade_number: number;
+  date: string;
+  symbol: string;
+  company_name: string;
+  trade_type: string;
+  trade_return_pct: number;
+  cumulative_return_pct: number;
+  benchmark_return_pct: number;
+  cumulative_benchmark_pct: number;
+  peak_return_pct: number;
+  drawdown_pct: number;
+}
+
+export interface BlindExclusionItem {
+  id: number;
+  symbol: string;
+  company_name: string;
+  announcement_date: string;
+  exclusion_reason: string;
+  details: string;
+  logged_at: string;
+}

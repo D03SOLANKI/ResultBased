@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from backend.app.database import init_db
-from backend.app.routers import stats, calendar, companies, announcements, report, performance, post_market_tracker, predictions
+from backend.app.routers import stats, calendar, companies, announcements, report, performance, post_market_tracker, predictions, blind_backtest
 from backend.app.services.realtime_surveillance import start_surveillance_worker, stop_surveillance_worker
 from backend.app.services.financial_statement_verifier import execute_full_verification_and_seeding
 from backend.app.services.financial_data_auditor import run_comprehensive_financial_audit
@@ -37,6 +37,7 @@ app.include_router(report.router)
 app.include_router(performance.router)
 app.include_router(post_market_tracker.router)
 app.include_router(predictions.router)
+app.include_router(blind_backtest.router, prefix="/api/blind-backtest", tags=["Blind Backtesting"])
 
 @app.on_event("startup")
 def on_startup():
